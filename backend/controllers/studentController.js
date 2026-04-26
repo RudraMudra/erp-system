@@ -7,7 +7,10 @@ export const createStudent = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const student = await Student.create(req.body);
+    const student = await Student.create({
+      ...req.body,
+      userId: req.body.userId || null,
+    });
 
     res.status(201).json({
       message: "Student created successfully",
@@ -21,9 +24,27 @@ export const createStudent = async (req, res) => {
 // GET ALL STUDENTS (only active)
 export const getStudents = async (req, res) => {
   try {
-    const students = await Student.find({ isDeleted: false }).sort({
-      createdAt: -1,
-    });
+    let students;
+
+    // ADMIN → all students
+    if (req.user.role === "admin") {
+      students = await Student.find({ isDeleted: false }).sort({
+        createdAt: -1,
+      });
+    }
+
+    // STUDENT → only own data
+    else if (req.user.role === "student") {
+      students = await Student.find({
+        userId: req.user.userId,
+        isDeleted: false,
+      });
+    }
+
+    // others (optional for now)
+    else {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
     res.json(students);
   } catch (error) {
