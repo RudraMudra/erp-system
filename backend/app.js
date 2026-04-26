@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js";
 import { verifyToken, checkRole } from "./middleware/authMiddleware.js";
 
 const app = express();
@@ -8,7 +9,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ================= ROUTES =================
+
+// Auth routes
 app.use("/api/auth", authRoutes);
+
+// Student routes
+app.use("/api/students", studentRoutes);
 
 app.get("/api/test", (req, res) => {
   res.json({ message: "API is working 🚀" });
