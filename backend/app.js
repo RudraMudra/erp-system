@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
-import { verifyToken } from "./middleware/authMiddleware.js";
+import { verifyToken, checkRole } from "./middleware/authMiddleware.js";
 
 const app = express();
 
@@ -19,6 +19,10 @@ app.get("/api/protected", verifyToken, (req, res) => {
     message: "Protected route accessed ✅",
     user: req.user,
   });
+});
+
+app.get("/api/admin", verifyToken, checkRole("admin"), (req, res) => {
+  res.json({ message: "Welcome Admin ✅" });
 });
 
 export default app;
